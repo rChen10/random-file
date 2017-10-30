@@ -17,12 +17,6 @@ int generate(int fldis){
 }
 
 
-
-void read_from(int fldis, int *buff){
-  printf("%lu\n", sizeof(buff));
-  read(fldis, buff, sizeof(buff) * 10);
-}
-
 int main(){
   int nums[10];
   int *ran = nums;
