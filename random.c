@@ -12,52 +12,63 @@ int generate(int fldis){
   int randos;
   read(fldis, &randos, sizeof(randos));
   //printf("read\n");
-  printf("%d\n", randos);
+  //printf("%d\n", randos);
   return randos;
 }
 
-void write_to(int fldis, int *randos, int num){
-  if (! num) return;
-  write(fldis, randos, sizeof(*randos));
-  write(fldis, "\n", sizeof "\n");
-  write_to(fldis, ++randos, --num);
-}
 
-void read_from(int fldis){
-  
+
+void read_from(int fldis, int *buff){
+  printf("%lu\n", sizeof(buff));
+  read(fldis, buff, sizeof(buff) * 10);
 }
 
 int main(){
   int nums[10];
   int *ran = nums;
   int i = 0;
-  int fldis = open("/dev/random", O_RDONLY);
-  if (fldis < 0){
+  int fledis = open("/dev/random", O_RDONLY);
+  if (fledis < 0){
     printf("%s\n", strerror(errno));
     return;
   }
   printf("Generating random numbers:\n");
   for (; i<10; i++){
-    printf("random %d: ", i);
-    nums[i] = generate(fldis);
+    nums[i] = generate(fledis);
+    printf("random %d: %d\n", i, nums[i]);
   }
-  close(fldis);
-
+  close(fledis);
+  i = 0;
   
+
   printf("Writing numbers to random_output...\n");
-  fldis = open("random_output", O_CREAT | O_WRONLY, 644);
+  int fldis = open("random_output", O_CREAT | O_WRONLY, 0777);
   if (fldis < 0){
     printf("%s\n", strerror(errno));
     return;
   }
-  write_to(fldis, ran, sizeof nums / sizeof(int));
+  write(fldis, nums, sizeof(nums));
   //printf("%s\n", strerror(errno));
   //printf("%d\n", fldis);
   close(fldis);
 
-  
   printf("Reading numbers from random_output...\n");
   fldis = open("random_output", O_RDONLY);
-  
-  close(fldis);
+  if (fldis < 0){
+    printf("%s\n", strerror(errno));
+    return;
+  }
+  int nums_2[10];
+  read(fldis, nums_2, sizeof(nums_2));
+  //printf("%lu\n", sizeof nums_2 / sizeof(int));
+  //close(fldis);
+
+  //read_from(fldis, nums_2);
+  i = 0;
+  printf("Verification that written values are the same:\n");
+  for (; i<10; i++){
+    printf("random %d: %d\n", i, nums_2[i]);
+  }
+
+ 
 }
